@@ -13,11 +13,15 @@ import g11 from '../Images/g11.jpeg';
 import g12 from '../Images/g12.jpeg';
 import g13 from '../Images/g13.jpg';
 import g14 from '../Images/g14.jpg';
-
-
+import g15 from '../Images/g15.jpg';
+import g16 from '../Images/g16.jpg';
+import g17 from '../Images/g17.jpg';
+import g18 from '../Images/g18.jpg';
+import g19 from '../Images/g19.jpg';
+import g20 from '../Images/g20.jpg';
 
 const Gallery = () => {
-  const images = [g1, g2, g3, g4, g5, g6, g7,g8,g9,g10,g11,g12,g13,g14];
+  const images = [g1, g2, g3, g4, g5, g6, g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,g17,g18,g19,g20];
   const [visibleImages, setVisibleImages] = useState(new Array(images.length).fill(true));  // Set all images as visible
 
   return (
