@@ -30,9 +30,17 @@ import g28 from '../Images/g28.jpg';
 import g29 from '../Images/g29.JPG';
 import g30 from '../Images/g30.JPG';
 import g31 from '../Images/g31.JPG';
+import g32 from '../Images/g32.JPG';
+import g33 from '../Images/g33.JPG';
+import g34 from '../Images/g34.JPG';
+import g35 from '../Images/g35.JPG';
+import g36 from '../Images/g36.JPG';
+import g37 from '../Images/g37.JPG';
+import g38 from '../Images/g38.JPG';
+import g39 from '../Images/g39.jpg';
 
 const Gallery = () => {
-  const images = [g1, g2, g3, g4, g5, g6, g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,g17,g19,g20,g21,g22,g23,g24,g25,g26,g27,g28,g29,g30,g31];
+  const images = [g1, g2, g3, g4, g5, g6, g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,g17,g19,g20,g21,g22,g23,g24,g25,g26,g27,g28,g29,g30,g31,g32,g33,g34,g35,g36,g37,g38,g39];
   const [visibleImages, setVisibleImages] = useState(new Array(images.length).fill(true));  // Set all images as visible
 
   return (
