@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import maxwell from '../Images/maxwell.jpg'; // Adjust the path based on your folder structure
-
+import grayson from '../Images/grayson.jpg';
+import hudson from '../Images/Hudson.jpg'
 const Slideshow = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const slides = [
     maxwell,
-    'https://via.placeholder.com/800x400?text=Slide+2',
-    'https://via.placeholder.com/800x400?text=Slide+3',
+    grayson,
+    hudson,
+
   ];
 
   const nextSlide = () => {
@@ -23,12 +25,12 @@ const Slideshow = () => {
   return (
     <div className="mt-10 flex flex-col items-center px-4">
       <div
-        className="relative max-w-md w-full aspect-[-3/4] bg-gray-100 rounded-lg shadow-lg overflow-hidden"
+        className="relative max-w-md w-full aspect-[3/4] bg-gray-100 rounded-lg shadow-lg overflow-hidden"
       >
         <img
           src={slides[currentIndex]}
           alt={`Slide ${currentIndex + 1}`}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover"  // Ensures image covers the full area
         />
         <button
           onClick={prevSlide}
