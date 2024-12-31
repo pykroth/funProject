@@ -1,0 +1,34 @@
+@keyframes rise {
+    0% {
+      transform: translateY(100px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes pop {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  .animate-rise {
+    animation: rise 3s ease-out forwards; /* Adjust time for speed */
+  }
+  
+  .animate-pop {
+    animation: pop 1s ease-out forwards;
+    animation-delay: 1s; /* Delay to wait until year reaches 2025 */
+  }
+  

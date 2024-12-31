@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .cursor-yorushika {
+    @apply cursor-[url('Yorushika.png')_16_16,_auto]; 
+  }
+}
