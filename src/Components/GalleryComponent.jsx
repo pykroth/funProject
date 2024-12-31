@@ -1,38 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import g1 from '../Images/g1.jpg';
+import g2 from '../Images/g2.jpg';
+import g3 from '../Images/g3.jpg';
+import g4 from '../Images/g4.jpg';
+import g5 from '../Images/g5.jpg';
+import g6 from '../Images/g6.jpg';
+import g7 from '../Images/g7.jpg';
 
 const Gallery = () => {
-  const images = [
-    'https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg', // Example image 1
-    'https://via.placeholder.com/300', // Example image 2
-    'https://via.placeholder.com/300', // Example image 3
-    'https://via.placeholder.com/300', // Example image 4
-    'https://via.placeholder.com/300', // Example image 5
-    'https://via.placeholder.com/300', // Example image 6
-  ];
-
-  const [visibleImages, setVisibleImages] = useState(new Array(images.length).fill(false));
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, index) => {
-        if (entry.isIntersecting) {
-          setVisibleImages((prev) => {
-            const updated = [...prev];
-            updated[index] = true; // Mark the image as visible
-            return updated;
-          });
-        }
-      });
-    }, { threshold: 0.1 }); // Trigger when 10% of the image is in the viewport
-
-    // Observe each image
-    const imageElements = document.querySelectorAll('.gallery-image');
-    imageElements.forEach((imageElement) => observer.observe(imageElement));
-
-    return () => {
-      imageElements.forEach((imageElement) => observer.unobserve(imageElement));
-    };
-  }, []);
+  const images = [g1, g2, g3, g4, g5, g6, g7];
+  const [visibleImages, setVisibleImages] = useState(new Array(images.length).fill(true));  // Set all images as visible
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
@@ -41,7 +18,12 @@ const Gallery = () => {
           <img
             src={image}
             alt={`Gallery item ${index + 1}`}
-            className={`gallery-image object-cover w-full h-full transition-opacity duration-1000 ease-in-out opacity-0 ${visibleImages[index] ? 'opacity-100' : ''}`}
+            className={`gallery-image transition-opacity duration-1000 ease-in-out ${visibleImages[index] ? 'opacity-100' : 'opacity-0'}`}
+            style={{ 
+              objectFit: 'cover',  // Maintain aspect ratio while covering the space
+              width: '100%',        // Make the image fill the width of the container
+              height: '200px'       // Fixed height for all images
+            }}
           />
         </div>
       ))}
