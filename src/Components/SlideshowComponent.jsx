@@ -3,6 +3,7 @@ import maxwell from '../Images/maxwell.jpg'; // Adjust the path based on your fo
 import grayson from '../Images/grayson.jpg';
 import hudson from '../Images/Hudson.jpg'
 import soso from '../Images/soso.jpg'
+import twins from '../Images/twins.jpg'
 const Slideshow = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -11,7 +12,7 @@ const Slideshow = () => {
     grayson,
     hudson,
     soso,
-
+    twins,
   ];
 
   const nextSlide = () => {
