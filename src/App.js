@@ -15,7 +15,7 @@ const App = () => {
   return (
     <div>
       {!click ? (
-        <div className="flex items-center justify-center h-screen bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500">
+        <div className="flex items-center justify-center h-screen bg-red-800" >
           <div className="relative">
             {/* Bow */}
             <img

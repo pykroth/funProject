@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import maxwell from '../Images/maxwell.jpg'; // Adjust the path based on your folder structure
 import grayson from '../Images/grayson.jpg';
 import hudson from '../Images/Hudson.jpg'
+import soso from '../Images/soso.jpg'
 const Slideshow = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -9,6 +10,7 @@ const Slideshow = () => {
     maxwell,
     grayson,
     hudson,
+    soso,
 
   ];
 
