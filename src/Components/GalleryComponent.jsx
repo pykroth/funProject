@@ -16,7 +16,6 @@ import g14 from '../Images/g14.jpg';
 import g15 from '../Images/g15.jpg';
 import g16 from '../Images/g16.jpg';
 import g17 from '../Images/g17.jpg';
-
 import g19 from '../Images/g19.JPG';
 import g20 from '../Images/g20.JPG';
 import g21 from '../Images/g21.JPG';
@@ -47,21 +46,24 @@ import g45 from '../Images/g45.jpg';
 import g46 from '../Images/g46.jpg';
 import g47 from '../Images/g47.jpg';
 import g48 from '../Images/g48.jpg';
-
 import g50 from '../Images/g50.jpg';
 import g51 from '../Images/g51.jpg';
 import g52 from '../Images/g52.jpg';
 import g53 from '../Images/g53.jpg';
 import g54 from '../Images/g54.jpg';
-import g55 from '../Images/g55.jpg'
-import g56 from "../Images/g56.jpg"
+import g55 from '../Images/g55.jpg';
+import g56 from "../Images/g56.jpg";
+
 const Gallery = () => {
-  const images = [g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g13, g14, g15, g16, g17, g19, g20, g21, g22, g23, g24, g25, g26, g27, g28, g29, g30, g31, g32, g33, g34, g35, g36, g37, g38, g39, g40, g41,g42,g43,g44,g45,g46,g47,g48,g50,g51,g52,g53,g54,g55,g56];
-  const [visibleImages, setVisibleImages] = useState(new Array(images.length).fill(false)); // Set all images as initially invisible
+  const images = [g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g13, g14, g15, g16, g17, g19, g20, g21, g22, g23, g24, g25, g26, g27, g28, g29, g30, g31, g32, g33, g34, g35, g36, g37, g38, g39, g40, g41, g42, g43, g44, g45, g46, g47, g48, g50, g51, g52, g53, g54, g55, g56];
+  const [visibleImages, setVisibleImages] = useState(new Array(images.length).fill(false));
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true); // Auto-play by default
 
   const imageRefs = useRef(images.map(() => React.createRef()));
+  const intervalRef = useRef(null);
 
-  // Function to check if the image is in view
   const checkIfInView = () => {
     imageRefs.current.forEach((ref, index) => {
       if (ref.current) {
@@ -69,7 +71,7 @@ const Gallery = () => {
         if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
           setVisibleImages((prev) => {
             const updated = [...prev];
-            updated[index] = true; // Mark image as visible
+            updated[index] = true;
             return updated;
           });
         }
@@ -78,36 +80,171 @@ const Gallery = () => {
   };
 
   useEffect(() => {
-    // Add scroll event listener to check images on scroll
     window.addEventListener('scroll', checkIfInView);
-
-    // Initial check in case images are already in view
     checkIfInView();
-
-    // Cleanup the event listener on component unmount
     return () => {
       window.removeEventListener('scroll', checkIfInView);
     };
   }, []);
 
+  // Auto-advance slideshow
+  useEffect(() => {
+    if (isModalOpen && isPlaying) {
+      intervalRef.current = setInterval(() => {
+        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+      }, 5000); // 5 seconds
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
+    }
+  }, [isModalOpen, isPlaying, images.length]);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (!isModalOpen) return;
+      
+      if (e.key === 'ArrowRight') {
+        goToNext();
+      } else if (e.key === 'ArrowLeft') {
+        goToPrevious();
+      } else if (e.key === 'Escape') {
+        closeModal();
+      } else if (e.key === ' ') { // Spacebar to pause/play
+        e.preventDefault();
+        togglePlayPause();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isModalOpen, currentImageIndex]);
+
+  const openModal = (index) => {
+    setCurrentImageIndex(index);
+    setIsModalOpen(true);
+    setIsPlaying(true); // Start auto-play when opening
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setIsPlaying(false);
+    document.body.style.overflow = 'unset';
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  };
+
+  const goToNext = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    // Reset the timer when manually navigating
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  };
+
+  const goToPrevious = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    // Reset the timer when manually navigating
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  };
+
+  const togglePlayPause = () => {
+    setIsPlaying((prev) => !prev);
+  };
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-      {images.map((image, index) => (
-        <div key={index} className="relative overflow-hidden rounded-lg shadow-lg">
-          <img
-            ref={imageRefs.current[index]} // Attach the ref to each image
-            src={image}
-            alt={`Gallery item ${index + 1}`}
-            className={`gallery-image transition-opacity duration-1000 ease-in-out ${visibleImages[index] ? 'opacity-100' : 'opacity-0'}`}
-            style={{ 
-              objectFit: 'cover',  // Maintain aspect ratio while covering the space
-              width: '100%',        // Make the image fill the width of the container
-              height: '200px'       // Fixed height for all images
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+        {images.map((image, index) => (
+          <div 
+            key={index} 
+            className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={() => openModal(index)}
+          >
+            <img
+              ref={imageRefs.current[index]}
+              src={image}
+              alt={`Gallery item ${index + 1}`}
+              className={`gallery-image transition-opacity duration-1000 ease-in-out ${visibleImages[index] ? 'opacity-100' : 'opacity-0'}`}
+              style={{ 
+                objectFit: 'cover',
+                width: '100%',
+                height: '200px'
+              }}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Slideshow Modal */}
+      {isModalOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
+          onClick={closeModal}
+        >
+          {/* Close Button */}
+          <button
+            onClick={closeModal}
+            className="absolute top-4 right-4 text-white text-4xl font-bold hover:text-gray-300 z-10"
+          >
+            &times;
+          </button>
+
+          {/* Play/Pause Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              togglePlayPause();
             }}
+            className="absolute top-4 left-4 text-white text-2xl font-bold hover:text-gray-300 z-10 bg-black bg-opacity-50 px-4 py-2 rounded"
+          >
+            {isPlaying ? '⏸ Pause' : '▶ Play'}
+          </button>
+
+          {/* Previous Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              goToPrevious();
+            }}
+            className="absolute left-4 text-white text-5xl font-bold hover:text-gray-300 z-10"
+          >
+            &#8249;
+          </button>
+
+          {/* Image */}
+          <img
+            src={images[currentImageIndex]}
+            alt={`Slide ${currentImageIndex + 1}`}
+            className="max-h-[90vh] max-w-[90vw] object-contain"
+            onClick={(e) => e.stopPropagation()}
           />
+
+          {/* Next Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              goToNext();
+            }}
+            className="absolute right-4 text-white text-5xl font-bold hover:text-gray-300 z-10"
+          >
+            &#8250;
+          </button>
+
+          {/* Image Counter */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-lg">
+            {currentImageIndex + 1} / {images.length}
+          </div>
         </div>
-      ))}
-    </div>
+      )}
+    </>
   );
 };
 
