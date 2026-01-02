@@ -34,7 +34,7 @@ const IntroAnimation = () => {
 
         {showMessage && (
           <div className="mt-8 text-4xl font-semibold text-white animate-fade-in">
-            Happy Birthday ama!
+            Happy Birthday mama!
           </div>
         )}
       </div>
