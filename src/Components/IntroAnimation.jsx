@@ -11,7 +11,7 @@ const IntroAnimation = () => {
     
     const interval = setInterval(() => {
       setYear((prevYear) => {
-        if (prevYear < 2025) {
+        if (prevYear < 2026) {
           return prevYear + 1;
         }
         clearInterval(interval);
