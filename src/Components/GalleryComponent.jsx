@@ -54,15 +54,25 @@ import g54 from '../Images/g54.jpg';
 import g55 from '../Images/g55.jpg';
 import g56 from "../Images/g56.jpg";
 
+// Import multiple songs
+import backgroundMusic from '../Audio/background-music.mp3';
+import backgroundMusic2 from '../Audio/background-music2.mp3';
+
+
 const Gallery = () => {
   const images = [g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g13, g14, g15, g16, g17, g19, g20, g21, g22, g23, g24, g25, g26, g27, g28, g29, g30, g31, g32, g33, g34, g35, g36, g37, g38, g39, g40, g41, g42, g43, g44, g45, g46, g47, g48, g50, g51, g52, g53, g54, g55, g56];
+  const songs = [backgroundMusic, backgroundMusic2]; // Array of songs
+  
   const [visibleImages, setVisibleImages] = useState(new Array(images.length).fill(false));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true); // Auto-play by default
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [currentSong, setCurrentSong] = useState(backgroundMusic); // Track current song
 
   const imageRefs = useRef(images.map(() => React.createRef()));
   const intervalRef = useRef(null);
+  const audioRef = useRef(null);
 
   const checkIfInView = () => {
     imageRefs.current.forEach((ref, index) => {
@@ -87,12 +97,49 @@ const Gallery = () => {
     };
   }, []);
 
-  // Auto-advance slideshow
+  // Play/pause music based on modal state
+  useEffect(() => {
+    if (audioRef.current) {
+      if (isModalOpen) {
+        audioRef.current.volume = 0.3;
+        audioRef.current.play()
+          .then(() => {
+            setIsMusicPlaying(true);
+          })
+          .catch((error) => {
+            console.log('Autoplay prevented:', error);
+          });
+      } else {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        setIsMusicPlaying(false);
+      }
+    }
+  }, [isModalOpen, currentSong]); // Added currentSong dependency
+
+  // Auto-play next song when current one ends
+  useEffect(() => {
+    const handleSongEnd = () => {
+      const currentIndex = songs.indexOf(currentSong);
+      const nextIndex = (currentIndex + 1) % songs.length;
+      setCurrentSong(songs[nextIndex]);
+    };
+
+    if (audioRef.current) {
+      audioRef.current.addEventListener('ended', handleSongEnd);
+      return () => {
+        if (audioRef.current) {
+          audioRef.current.removeEventListener('ended', handleSongEnd);
+        }
+      };
+    }
+  }, [currentSong, songs]);
+
   useEffect(() => {
     if (isModalOpen && isPlaying) {
       intervalRef.current = setInterval(() => {
         setCurrentImageIndex((prev) => (prev + 1) % images.length);
-      }, 5000); // 5 seconds
+      }, 5000);
 
       return () => {
         if (intervalRef.current) {
@@ -102,7 +149,6 @@ const Gallery = () => {
     }
   }, [isModalOpen, isPlaying, images.length]);
 
-  // Handle keyboard navigation
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (!isModalOpen) return;
@@ -113,7 +159,7 @@ const Gallery = () => {
         goToPrevious();
       } else if (e.key === 'Escape') {
         closeModal();
-      } else if (e.key === ' ') { // Spacebar to pause/play
+      } else if (e.key === ' ') {
         e.preventDefault();
         togglePlayPause();
       }
@@ -123,10 +169,32 @@ const Gallery = () => {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [isModalOpen, currentImageIndex]);
 
+  const toggleMusic = () => {
+    if (audioRef.current) {
+      if (isMusicPlaying) {
+        audioRef.current.pause();
+        setIsMusicPlaying(false);
+      } else {
+        audioRef.current.play();
+        setIsMusicPlaying(true);
+      }
+    }
+  };
+
+  const skipSong = () => {
+    const currentIndex = songs.indexOf(currentSong);
+    const nextIndex = (currentIndex + 1) % songs.length;
+    setCurrentSong(songs[nextIndex]);
+  };
+
   const openModal = (index) => {
+    // Pick a random song when opening modal
+    const randomSong = songs[Math.floor(Math.random() * songs.length)];
+    setCurrentSong(randomSong);
+    
     setCurrentImageIndex(index);
     setIsModalOpen(true);
-    setIsPlaying(true); // Start auto-play when opening
+    setIsPlaying(true);
     document.body.style.overflow = 'hidden';
   };
 
@@ -141,7 +209,6 @@ const Gallery = () => {
 
   const goToNext = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    // Reset the timer when manually navigating
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
@@ -149,7 +216,6 @@ const Gallery = () => {
 
   const goToPrevious = () => {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-    // Reset the timer when manually navigating
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
@@ -161,6 +227,12 @@ const Gallery = () => {
 
   return (
     <>
+      {/* Background Music - only plays when modal is open */}
+      <audio ref={audioRef} loop>
+        <source src={currentSong} type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
         {images.map((image, index) => (
           <div 
@@ -189,7 +261,6 @@ const Gallery = () => {
           className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
           onClick={closeModal}
         >
-          {/* Close Button */}
           <button
             onClick={closeModal}
             className="absolute top-4 right-4 text-white text-4xl font-bold hover:text-gray-300 z-10"
@@ -197,7 +268,6 @@ const Gallery = () => {
             &times;
           </button>
 
-          {/* Play/Pause Button */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -208,7 +278,26 @@ const Gallery = () => {
             {isPlaying ? '⏸ Pause' : '▶ Play'}
           </button>
 
-          {/* Previous Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleMusic();
+            }}
+            className="absolute top-4 right-20 text-white text-2xl hover:text-gray-300 z-10 bg-black bg-opacity-50 px-4 py-2 rounded"
+          >
+            {isMusicPlaying ? '🔊' : '🔇'}
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              skipSong();
+            }}
+            className="absolute top-4 right-36 text-white text-2xl hover:text-gray-300 z-10 bg-black bg-opacity-50 px-4 py-2 rounded"
+          >
+            ⏭️
+          </button>
+
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -219,7 +308,6 @@ const Gallery = () => {
             &#8249;
           </button>
 
-          {/* Image */}
           <img
             src={images[currentImageIndex]}
             alt={`Slide ${currentImageIndex + 1}`}
@@ -227,7 +315,6 @@ const Gallery = () => {
             onClick={(e) => e.stopPropagation()}
           />
 
-          {/* Next Button */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -238,7 +325,6 @@ const Gallery = () => {
             &#8250;
           </button>
 
-          {/* Image Counter */}
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-lg">
             {currentImageIndex + 1} / {images.length}
           </div>
